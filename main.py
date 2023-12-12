@@ -156,6 +156,12 @@ for i in range(10000):
     if winner == 'O':
         with open("res.txt", "a") as output:
             print(str(position), file=output)
+    with open("games.txt", "a") as output:
+        print(str(board[0]), file=output)
+        print(str(board[1]), file=output)
+        print(str(board[2]), file=output)
+        print("Winner is: " + winner, file=output)
+
     print(board[0])
     print(board[1])
     print(board[2])
