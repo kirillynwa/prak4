@@ -1,7 +1,7 @@
 import numpy as np
 import random
 import pandas as pd
-
+import matplotlib.pyplot as plt
 
 pos = {1: (0, 0), 2: (0, 1), 3: (0, 2),
        4: (1, 0), 5: (1, 1), 6: (1, 2),
@@ -10,7 +10,8 @@ pos = {1: (0, 0), 2: (0, 1), 3: (0, 2),
 pos1 = {(0, 0): 1, (0, 1): 2, (0, 2): 3,
         (1, 0): 4, (1, 1): 5, (1, 2): 6,
         (2, 0): 7, (2, 1): 8, (2, 2): 9}
-
+x = []
+y = []
 
 def create_board():
     return (np.array([["-", "-", "-"],
@@ -32,15 +33,29 @@ def possibilities(board):
 
 def random_place(board, player):
     selection = possibilities(board)
+    state = False
     try:
-        current_loc = random.choice(selection)
+        if player == "O":
+            with open("res.txt", "r") as file:
+                line = file.readline()
+                while line:
+                    temp = str(position)
+                    temp = temp[:-1]
+                    index = line.find(temp, 0, len(temp))
+                    if index == 0:
+                        pos2 = int(line[len(temp) + 2])
+                        if pos[pos2] in selection:
+                            current_loc = pos[pos2]
+                            state = True
+                            break
+                    line = file.readline()
+        if state == False:
+            current_loc = random.choice(selection)
         board[current_loc] = player
         position.append(pos1[current_loc])
-        return(board, " ")
-    except:
-
-        return(board, "Draw")
-
+        return (board, " ")
+    except  Exception as e:
+        return (board, "Draw")
 
 
 # Checks whether the player has three
@@ -121,32 +136,63 @@ def evaluate(board):
 # Main function to start the game
 
 position = []
+
+
 def play_game():
     board, winner, counter = create_board(), "0", 1
     while winner == "0":
         for player in ["X", "O"]:
             board, res = random_place(board, player)
             if res == "Draw":
-                return("Draw", board)
+                return ("Draw", board)
             counter += 1
             winner = evaluate(board)
             if winner != "0":
                 break
     return (winner, board)
+counter = 0
+for i in range(10000):
+    winner, board = play_game()
+    if winner == 'O':
+        with open("res.txt", "a") as output:
+            print(str(position), file=output)
+    print(board[0])
+    print(board[1])
+    print(board[2])
+    print("Winner is: " + winner)
+    counter += 1
+    x.append(counter)
+    if winner == 'Draw':
+        y.append('Draw')
+    if winner == 'O':
+        y.append('Win')
+    if winner == 'X':
+        y.append('Loss')
+    position.clear()
 
 
-winner, board = play_game()
-if winner != "Draw":
-    count = 9 - len(position)
-    for i in range(count):
-        position.append("-")
-    columns = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'winner']
-    data = [[position[0], position[1], position[2], position[3], position[4], position[5], position[6], position[7], position[8], winner]]
-    df = pd.DataFrame(data, columns=columns)
-    df.to_csv('res.csv', mode='a', header=False, index=False)
-# print(board[0])
-# print(board[1])
-# print(board[2])
-#
-# print("Winner is: " + winner)
+plt.plot(x, y)
+plt.xlabel('Количество шагов обучения')
+plt.ylabel('Результат игры')
+plt.title('График зависимостей')
+plt.show()
 
+# lists = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'winner']
+# lists1 = ['1', '2', '3', '4']
+
+# print(str(lists1)[:-1])
+# with open("res.txt", "w") as output:
+#     output.write(str(lists))
+# with open("res.txt", "r") as file:
+#     line = file.readline()
+#     while line:
+#         print(line, end="")
+#         if str(lists1)[:-1] in line:
+#             print("True")
+#         line = file.readline()
+
+
+# string = str(lists)
+# index = string.find(str(lists1)[:-1], 0, len(str(lists1)[:-1]))
+# print(index)
+# print(string[len(str(lists1)[:-1])+3])
