@@ -151,6 +151,7 @@ def play_game():
                 break
     return (winner, board)
 counter = 0
+reward = 0
 for i in range(10000):
     winner, board = play_game()
     if winner == 'O':
@@ -169,11 +170,12 @@ for i in range(10000):
     counter += 1
     x.append(counter)
     if winner == 'Draw':
-        y.append('Draw')
+        reward += 0
     if winner == 'O':
-        y.append('Win')
+        reward += 1
     if winner == 'X':
-        y.append('Loss')
+        reward -= 1
+    y.append(reward)
     position.clear()
 
 
